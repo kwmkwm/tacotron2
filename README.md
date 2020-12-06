@@ -4,4 +4,4 @@ This repo contains attempts to improve the accuracy of NVIDIA's [Tacotron 2](htt
 
 # Usage
 
-For information on how to use this code please visit NVIDIA's original [Tacotron 2](https://github.com/kwmkwm/LJSpeech1.1-expanded) repository. You may also find [this Youtube video](https://www.youtube.com/watch?v=Y7gJAEIweSE) helpful.
+For information on how to use this code please visit NVIDIA's original [Tacotron 2](https://github.com/NVIDIA/tacotron2) repository. You may also find [this Youtube video](https://www.youtube.com/watch?v=Y7gJAEIweSE) helpful.
