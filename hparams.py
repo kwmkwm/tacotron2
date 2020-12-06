@@ -1,5 +1,6 @@
 import tensorflow as tf
 from text import symbols
+from text import phonemes
 
 
 def create_hparams(hparams_string=None, verbose=False):
@@ -44,7 +45,8 @@ def create_hparams(hparams_string=None, verbose=False):
         ################################
         # Model Parameters             #
         ################################
-        n_symbols=len(symbols),
+        #n_symbols=len(symbols),
+        n_symbols=len(phonemes),
         symbols_embedding_dim=512,
 
         # Encoder parameters

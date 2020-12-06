@@ -1,12 +1,23 @@
-""" from https://github.com/keithito/tacotron """
+"""
+from https://github.com/keithito/tacotron
+
+additonal changes https://github.com/kwmkwm/tacotron2-phonetic
+"""
 import re
 from text import cleaners
 from text.symbols import symbols
+from text.phonemes import phonemes
+from text.phonemes import _text_normalize
+from text.phonemes import _phoneme_normalize
+from g2p_en import G2p
+
+g2p = G2p()
 
 
 # Mappings from symbol to numeric ID and vice versa:
 _symbol_to_id = {s: i for i, s in enumerate(symbols)}
 _id_to_symbol = {i: s for i, s in enumerate(symbols)}
+_phoneme_to_id ={p: i for i, p in enumerate(phonemes)}
 
 # Regular expression matching text enclosed in curly braces:
 _curly_re = re.compile(r'(.*?)\{(.+?)\}(.*)')
@@ -39,6 +50,40 @@ def text_to_sequence(text, cleaner_names):
 
   return sequence
 
+def text_to_phonemes(text, cleaner_names):
+  '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
+
+    The text can optionally have phoneme sequences enclosed in curly braces embedded
+    in it. Valid phonemes can be found in phonemes.py This functionality is incomplete
+    as it does not adequately format spaces.
+
+    TODO: fix the space issue
+
+    Args:
+      text: string to convert to a sequence
+      cleaner_names: names of the cleaner functions to run the text through
+
+    Returns:
+      List of integers corresponding to the symbols in the text
+  '''
+
+  sequence = []
+
+  # Check for curly braces and treat their contents as ARPAbet:
+  while len(text):
+    m = _curly_re.match(text)
+    if not m:
+      # the _text_normalize function might not be necessary
+      sequence += g2p(_text_normalize(_clean_text(text, cleaner_names)))
+      break
+    # the _text_normalize function might not be necessary
+    sequence += g2p(_text_normalize(_clean_text(m.group(1), cleaner_names)))
+    sequence += m.group(2).split()
+    text = m.group(3)
+
+  sequence += ["EOS"]
+  return _phonemes_to_sequence(_phoneme_normalize(sequence))
+
 
 def sequence_to_text(sequence):
   '''Converts a sequence of IDs back to a string'''
@@ -65,10 +110,11 @@ def _clean_text(text, cleaner_names):
 def _symbols_to_sequence(symbols):
   return [_symbol_to_id[s] for s in symbols if _should_keep_symbol(s)]
 
+def _phonemes_to_sequence(phonemes):
+  return [_phoneme_to_id[p] for p in phonemes]
 
 def _arpabet_to_sequence(text):
   return _symbols_to_sequence(['@' + s for s in text.split()])
-
 
 def _should_keep_symbol(s):
   return s in _symbol_to_id and s is not '_' and s is not '~'
